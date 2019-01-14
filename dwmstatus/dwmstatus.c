@@ -16,6 +16,8 @@
 #include <sys/wait.h>
 
 #include <X11/Xlib.h>
+#include <alsa/asoundlib.h>
+#include <alsa/mixer.h>
 
 char *tzbris = "Australia/Brisbane";
 
@@ -173,6 +175,32 @@ gettemperature(char *base, char *sensor)
 	return smprintf("%02.0f°C", atof(co) / 1000);
 }
 
+
+void 
+alsavolume(char* volstr) {
+	long min,max,volleft,volright,volavg;
+	snd_mixer_t *handle;
+	snd_mixer_selem_id_t *sid;
+	const char *card = "default";
+	const char *selem_name = "Master";
+		    
+	snd_mixer_open(&handle,0);
+	snd_mixer_attach(handle,card);
+	snd_mixer_selem_register(handle,NULL,NULL);
+	snd_mixer_load(handle);
+				    
+	snd_mixer_selem_id_alloca(&sid);
+	snd_mixer_selem_id_set_index(sid,0);
+	snd_mixer_selem_id_set_name(sid,selem_name);
+	snd_mixer_elem_t* elem = snd_mixer_find_selem(handle,sid);
+						    
+	snd_mixer_selem_get_playback_volume_range(elem,&min,&max);
+	snd_mixer_selem_get_playback_volume(elem,0,&volleft);
+	snd_mixer_selem_get_playback_volume(elem,1,&volright);
+	volavg = (volleft+volright)/2;
+	sprintf(volstr,"%ld",((volavg-min)*100)/(max-min));
+}
+
 int
 main(void)
 {
@@ -180,6 +208,7 @@ main(void)
 	char *bat;
 	char *tmbris;
 	char *t0;
+	char volm[40];
 
 	if (!(dpy = XOpenDisplay(NULL))) {
 		fprintf(stderr, "dwmstatus: cannot open display.\n");
@@ -188,11 +217,12 @@ main(void)
 
 	for (;;sleep(30)) {
 		bat = getbattery("/sys/class/power_supply/BAT0");
-		tmbris = mktimes("%W %a %d %b %H:%M", tzbris);
+		tmbris = mktimes("Week %V %a, %d %b %I:%M %p", tzbris);
+		alsavolume(volm);	
 		t0 = gettemperature("/sys/devices/virtual/hwmon/hwmon0", "temp1_input");
 
-		status = smprintf("%s| %s | %s",
-				t0, bat, tmbris);
+		status = smprintf(" %s | %s | %s%% | %s",
+				t0, bat, volm, tmbris);
 		setstatus(status);
 
 		free(t0);
