@@ -215,7 +215,7 @@ main(void)
 		return 1;
 	}
 
-	for (;;sleep(30)) {
+	for (;;sleep(5)) {
 		bat = getbattery("/sys/class/power_supply/BAT0");
 		tmbris = mktimes("Week %V %a, %d %b %I:%M %p", tzbris);
 		alsavolume(volm);	
