@@ -3,3 +3,6 @@ The mod key has been changed to the Windows key. Some other hotkeys have been ch
 
 # dwmstatus
 The status bar displays CPU temp, battery level, volume and the date.
+
+# thinkfan
+Desired temperatures for a Thinkpad x220.
