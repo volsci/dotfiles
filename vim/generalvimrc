@@ -1,0 +1,11 @@
+" General Vimrc
+filetype plugin indent on
+syntax on
+runtime macros/matchit.vim
+set clipboard=unnamed
+
+set autoindent
+set backspace=indent,eol,start
+set incsearch
+set ruler
+set number
