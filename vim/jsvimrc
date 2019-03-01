@@ -21,6 +21,6 @@ map <C-n> :NERDTreeToggle<CR>
 
 " Javascript Support
 packadd vim-javascript
-
+packadd vim-jsx
 
 
